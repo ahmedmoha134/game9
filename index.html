@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أَكْتَشِفُ وَأَبْتَكِرُ مَعَ حَرْفِ النُّونِ - الأُسْتَاذَة مَرْيَم البَلُوشِيّ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        space: {
+                            dark: '#0B0F29',
+                            card: '#1E1B4B',
+                            accent: '#6366F1',
+                            gold: '#F59E0B',
+                            teal: '#14B8A6',
+                            rose: '#F43F5E',
+                            purple: '#A855F7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'Tajawal', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float-rocket': 'floatRocket 3s ease-in-out infinite',
+                        'spin-slow': 'spin 12s linear infinite'
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { filter: 'drop-shadow(0 0 10px rgba(99, 102, 241, 0.8))' },
+                            '50%': { filter: 'drop-shadow(0 0 22px rgba(245, 158, 11, 0.9))' }
+                        },
+                        floatRocket: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-10px) rotate(3deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at center, #1E1B4B 0%, #0F172A 60%, #020617 100%);
+            min-height: 100vh;
+            user-select: none;
+            touch-action: manipulation;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        .game-panel {
+            background: rgba(30, 27, 75, 0.85);
+            backdrop-filter: blur(16px);
+            border: 3px solid rgba(99, 102, 241, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .btn-action {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-action:hover {
+            transform: translateY(-3px) scale(1.02);
+            filter: brightness(1.15);
+        }
+        .btn-action:active {
+            transform: translateY(2px) scale(0.97);
+        }
+
+        .slot-target {
+            background: rgba(15, 23, 42, 0.7);
+            border: 3px dashed #6366F1;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        /* Printable certificate styling */
+        @media print {
+            body { background: white !important; color: black !important; }
+            #header-bar, #footer-bar, .no-print { display: none !important; }
+            #app-container { border: none !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; background: white !important; }
+            .certificate-box { border: 8px solid #D97706 !important; background: #FFFBEB !important; color: #1E3A8A !important; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-2 sm:p-4">
+
+    <!-- Main Game Container -->
+    <div id="app-container" class="w-full max-w-4xl min-h-[720px] game-panel rounded-3xl p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden my-auto border-4 border-indigo-500/50">
+        
+        <!-- Top Navigation / Score / Credits Header -->
+        <header id="header-bar" class="bg-slate-900/90 rounded-2xl p-3 mb-3 border border-indigo-500/30 flex flex-wrap items-center justify-between gap-3">
+            
+            <div class="flex items-center gap-3">
+                <button onclick="renderMap()" class="bg-gradient-to-r from-indigo-600 to-purple-600 px-3.5 py-1.5 rounded-xl border border-indigo-300 font-black text-xs sm:text-sm text-white flex items-center gap-2 btn-action">
+                    <i class="fas fa-map"></i>
+                    <span>خَرِيطَةُ المَرَاحِلِ</span>
+                </button>
+                <div>
+                    <h1 class="text-xs sm:text-sm font-black text-amber-300">
+                        أَهْلاً بِكُمْ يَا طُلَّابِي الأَذْكِيَاء! 🚀
+                    </h1>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal-300">
+                        إِعْدَادُ الأُسْتَاذَةِ: مَرْيَم البَلُوشِيّ
+                    </p>
+                </div>
+            </div>
+
+            <!-- Score / Stars / Mute Controls -->
+            <div class="flex items-center gap-2">
+                <div class="bg-slate-800/90 px-3 py-1 rounded-xl border border-amber-500/40 text-amber-400 font-black text-xs sm:text-sm flex items-center gap-1.5">
+                    <i class="fas fa-star text-amber-400"></i>
+                    <span id="score-val">0</span>
+                </div>
+                <button onclick="toggleMute()" class="bg-slate-800 text-slate-200 p-2 rounded-xl text-xs sm:text-sm border border-slate-600 hover:bg-slate-700 btn-action" aria-label="كتم الصوت">
+                    <i id="sound-icon" class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Main Stage Canvas Area -->
+        <main id="main-content" class="flex-1 flex flex-col justify-center my-auto relative">
+            <!-- Dynamic JavaScript Views Rendered Here -->
+        </main>
+
+        <!-- Toast Notification Banner -->
+        <div id="toast-banner" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 transform transition-all duration-300 -translate-y-24 opacity-0 pointer-events-none">
+            <div id="toast-body" class="px-6 py-3 rounded-2xl font-black text-sm sm:text-base text-white shadow-2xl flex items-center gap-2">
+                <span id="toast-emoji">✨</span>
+                <span id="toast-msg">إِجَابَةٌ مُمْتَازَةٌ!</span>
+            </div>
+        </div>
+
+        <!-- App Footer -->
+        <footer id="footer-bar" class="mt-3 text-center text-xs font-bold text-slate-400 border-t border-slate-700/60 pt-2 flex items-center justify-between no-print">
+            <span>أَكْتَشِفُ وَأَبْتَكِرُ مَعَ حَرْفِ النُّونِ 🌌</span>
+            <span class="font-black text-amber-300">إِعْدَادُ الأُسْتَاذَةِ: مَرْيَم البَلُوشِيّ</span>
+            <span>5 مَرَاحِلَ مُتَقَدِّمَةٍ 🎯</span>
+        </footer>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Web Audio Synthesizer Audio Engine
+        class AudioEngine {
+            constructor() { this.ctx = null; }
+            init() { 
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playSuccess() {
+                if (isMuted) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(554.37, now + 0.1);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.2);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now); osc.stop(now + 0.45);
+                } catch (e) { console.warn('Audio play error:', e); }
+            }
+            playError() {
+                if (isMuted) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(140, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now); osc.stop(now + 0.3);
+                } catch (e) { console.warn('Audio play error:', e); }
+            }
+            playLaser() {
+                if (isMuted) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(900, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now); osc.stop(now + 0.15);
+                } catch (e) { console.warn('Audio play error:', e); }
+            }
+            playExplosion() {
+                if (isMuted) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.linearRampToValueAtTime(40, now + 0.35);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now); osc.stop(now + 0.35);
+                } catch (e) { console.warn('Audio play error:', e); }
+            }
+        }
+
+        const synth = new AudioEngine();
+        let isMuted = false;
+        let totalScore = 0;
+        let unlockedLevel = 1;
+        let levelStars = [0, 0, 0, 0, 0];
+        let activeInterval = null;
+        let activeTimeout = null;
+        let activeAnimationFrame = null;
+
+        // Strict Arabic Text-To-Speech Engine
+        let cachedVoice = null;
+        function setupVoice() {
+            if (!('speechSynthesis' in window)) return;
+            try {
+                const voices = window.speechSynthesis.getVoices();
+                cachedVoice = voices.find(v => v.lang && (v.lang.startsWith('ar-SA') || v.lang.startsWith('ar_SA'))) ||
+                              voices.find(v => v.lang && (v.lang.startsWith('ar-OM') || v.lang.startsWith('ar_OM'))) ||
+                              voices.find(v => v.lang && (v.lang.startsWith('ar-EG') || v.lang.startsWith('ar_EG'))) ||
+                              voices.find(v => v.lang && v.lang.startsWith('ar')) || null;
+            } catch (e) {
+                console.warn('Speech synthesis initialization warning:', e);
+            }
+        }
+
+        if ('speechSynthesis' in window) {
+            try {
+                window.speechSynthesis.onvoiceschanged = setupVoice;
+                setupVoice();
+            } catch (e) { console.warn('Voice listener setup error:', e); }
+        }
+
+        function speakArabic(text) {
+            if (isMuted || !('speechSynthesis' in window)) return;
+            try {
+                if (!cachedVoice) setupVoice();
+
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ar-SA';
+                if (cachedVoice) {
+                    utterance.voice = cachedVoice;
+                }
+                utterance.rate = 0.85;
+                utterance.pitch = 1.05;
+                
+                // Prevent utterance errors from throwing uncaught exceptions
+                utterance.onerror = (e) => console.warn('Speech utterance error:', e);
+                window.speechSynthesis.speak(utterance);
+            } catch (err) {
+                console.warn('Speech synthesis call failed safely:', err);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('sound-icon');
+            if (icon) {
+                if (isMuted) {
+                    icon.className = 'fas fa-volume-mute text-rose-400';
+                    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+                } else {
+                    icon.className = 'fas fa-volume-up text-slate-200';
+                }
+            }
+        }
+
+        function clearTimers() {
+            if (activeInterval) { clearInterval(activeInterval); activeInterval = null; }
+            if (activeTimeout) { clearTimeout(activeTimeout); activeTimeout = null; }
+            if (activeAnimationFrame) { cancelAnimationFrame(activeAnimationFrame); activeAnimationFrame = null; }
+        }
+
+        function addScore(pts) {
+            totalScore += pts;
+            const scoreElem = document.getElementById('score-val');
+            if (scoreElem) scoreElem.innerText = totalScore;
+        }
+
+        function showToast(msg, isSuccess, emoji = '✨') {
+            const banner = document.getElementById('toast-banner');
+            const body = document.getElementById('toast-body');
+            const msgElem = document.getElementById('toast-msg');
+            const emojiElem = document.getElementById('toast-emoji');
+
+            if (!banner || !body || !msgElem || !emojiElem) return;
+
+            msgElem.innerText = msg;
+            emojiElem.innerText = emoji;
+
+            body.className = `px-6 py-3 rounded-2xl font-black text-sm sm:text-base text-white shadow-2xl flex items-center gap-2 ${
+                isSuccess ? 'bg-emerald-600 border-2 border-emerald-300' : 'bg-rose-600 border-2 border-rose-300'
+            }`;
+
+            banner.classList.remove('-translate-y-24', 'opacity-0');
+            banner.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                banner.classList.remove('translate-y-0', 'opacity-100');
+                banner.classList.add('-translate-y-24', 'opacity-0');
+            }, 1800);
+        }
+
+        // INIT APP
+        window.onload = function() {
+            renderWelcomeScreen();
+        };
+
+        // WELCOME SCREEN
+        function renderWelcomeScreen() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            main.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center py-2 my-auto space-y-4 animate-fade-in">
+                    
+                    <!-- Teacher Badge Header -->
+                    <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 px-6 py-2 rounded-full font-black text-xs sm:text-sm border-2 border-white shadow-lg flex items-center gap-2 btn-action">
+                        <i class="fas fa-award text-amber-950 text-base"></i>
+                        <span>إِعْدَادُ الأُسْتَاذَةِ: مَرْيَم البَلُوشِيّ</span>
+                    </div>
+
+                    <!-- Animated Space Mascot -->
+                    <div class="relative my-2">
+                        <div class="w-28 h-28 sm:w-36 sm:h-36 bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-400 rounded-full flex items-center justify-center text-6xl sm:text-7xl shadow-2xl border-4 border-indigo-300 animate-float-rocket">
+                            🚀
+                        </div>
+                        <span class="absolute -bottom-2 bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full border border-white shadow-md">
+                            حَرْفُ النُّونِ
+                        </span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h2 class="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-teal-300 drop-shadow-md">
+                            أَكْتَشِفُ وَأَبْتَكِرُ مَعَ حَرْفِ النُّونِ
+                        </h2>
+                        <p class="text-xs sm:text-base font-bold text-slate-300 max-w-lg mx-auto leading-relaxed">
+                            مَغَامَرَةٌ تَفَاعُلِيَّةٌ مَجَرِّيَّةٌ لِتَعَلُّمِ حَرْفِ النُّونِ بِمَوَاضِعِهِ، وَأَصْوَاتِهِ، وَالتَّنْوِينِ، وَتَرْكِيبِ الكَلِمَاتِ!
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-3 pt-2">
+                        <button onclick="renderMap()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg px-8 py-3 rounded-2xl shadow-xl border-b-4 border-teal-800 btn-action flex items-center gap-2">
+                            <span>إِبْدَأِ الرِّحْلَةَ المَجَرِّيَّةَ</span>
+                            <i class="fas fa-rocket text-amber-300"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            speakArabic("أَهْلاً بِكُمْ يَا طُلَّابِي الأَذْكِيَاء! مَعَكُمْ الأُسْتَاذَة مَرْيَم البَلُوشِيّ فِي لُعْبَةِ: أَكْتَشِفُ وَأَبْتَكِرُ مَعَ حَرْفِ النُّونِ!");
+        }
+
+        // MAP LEVEL SELECTION SCREEN
+        function renderMap() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            const levels = [
+                { id: 1, name: 'مُخْتَبَرُ تَرْكِيبِ الكَلِمَاتِ', icon: '🧪', desc: 'تَرْكِيبُ الحُرُوفِ' },
+                { id: 2, name: 'مَسَارُ الصَّارُوخِ الفَضَائِيِّ', icon: '🚀', desc: 'الحَرَكَاتُ وَالتَّنْوِينُ' },
+                { id: 3, name: 'مُحَقِّقُ النُّونِ السِّرِّيُّ', icon: '🔍', desc: 'الجُمَلُ وَالتَّدْقِيقُ' },
+                { id: 4, name: 'تَحَدِّي السُّرْعَةِ وَالتَّصْنِيفِ', icon: '⚡', desc: 'التَّصْنِيفُ السَّرِيعُ' },
+                { id: 5, name: 'مَعْرَكَةُ الكَنْزِ المَجَرِّيِّ', icon: '👑', desc: 'التَّحَدِّي الأَخِيرُ' }
+            ];
+
+            main.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full space-y-4 animate-fade-in">
+                    
+                    <div class="text-center space-y-1">
+                        <h2 class="text-xl sm:text-2xl font-black text-amber-300">
+                            🗺️ خَرِيطَةُ المَغَامَرَاتِ المَجَرِّيَّةِ
+                        </h2>
+                        <p class="text-xs sm:text-sm font-bold text-slate-300">
+                            اخْتَرِ المَرْحَلَةَ لِلْبَدْءِ مَعَ الأُسْتَاذَةِ مَرْيَم البَلُوشِيّ
+                        </p>
+                    </div>
+
+                    <!-- Levels Grid/Nodes -->
+                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 w-full max-w-3xl my-auto">
+                        ${levels.map((lvl) => {
+                            const isLocked = lvl.id > unlockedLevel;
+                            const stars = levelStars[lvl.id - 1];
+
+                            return `
+                                <div onclick="${isLocked ? '' : `startLevel(${lvl.id})`}" class="${isLocked ? 'opacity-50 cursor-not-allowed bg-slate-900 border-slate-700' : 'cursor-pointer bg-gradient-to-b from-slate-800 to-indigo-950 border-indigo-400 hover:border-amber-400 btn-action'} border-2 rounded-2xl p-3 flex flex-col items-center justify-between text-center shadow-lg relative min-h-[130px]">
+                                    
+                                    <div class="text-3xl my-1">${lvl.icon}</div>
+                                    <span class="text-xs font-black text-slate-100 leading-snug">${lvl.name}</span>
+                                    <span class="text-[10px] font-bold text-amber-300">${lvl.desc}</span>
+
+                                    <!-- Lock or Stars -->
+                                    <div class="mt-2 text-xs">
+                                        ${isLocked ? '<i class="fas fa-lock text-slate-500"></i>' : `
+                                            <div class="text-amber-400 space-x-0.5">
+                                                <i class="${stars >= 1 ? 'fas' : 'far'} fa-star"></i>
+                                                <i class="${stars >= 2 ? 'fas' : 'far'} fa-star"></i>
+                                                <i class="${stars >= 3 ? 'fas' : 'far'} fa-star"></i>
+                                            </div>
+                                        `}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="renderWelcomeScreen()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm px-5 py-2 rounded-xl border border-slate-600 btn-action">
+                            <i class="fas fa-arrow-right ml-1"></i> العَوْدَةُ لِلشَّاشَةِ الرَّئِيسِيَّةِ
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            speakArabic("اخْتَرِ المَرْحَلَةَ الَّتِي تُرِيدُ لَعِبَهَا!");
+        }
+
+        function startLevel(id) {
+            if (id === 1) renderLevel1();
+            else if (id === 2) renderLevel2();
+            else if (id === 3) renderLevel3();
+            else if (id === 4) renderLevel4();
+            else if (id === 5) renderLevel5();
+        }
+
+        // ==========================================
+        // LEVEL 1: "مُخْتَبَرُ تَرْكِيبِ الكَلِمَاتِ"
+        // ==========================================
+        function renderLevel1() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            const puzzles = [
+                {
+                    word: 'نَـمْلَة',
+                    img: '🐜',
+                    slots: ['نَـ', 'مْـ', 'لَـ', 'ةٌ'],
+                    tiles: ['مْـ', 'نَـ', 'ةٌ', 'لَـ'],
+                    hint: 'حَرْفُ النُّونِ فِي أَوَّلِ الكَلِمَةِ (نَـ)'
+                },
+                {
+                    word: 'مَـنْـزِل',
+                    img: '🏡',
+                    slots: ['مَـ', 'ـنْـ', 'زِ', 'لٌ'],
+                    tiles: ['زِ', 'مَـ', 'ـنْـ', 'لٌ'],
+                    hint: 'حَرْفُ النُّونِ فِي وَسَطِ الكَلِمَةِ (ـنْـ)'
+                },
+                {
+                    word: 'صَابُون',
+                    img: '🧼',
+                    slots: ['صَـ', 'ا', 'بُـ', 'و', 'نٌ'],
+                    tiles: ['و', 'نٌ', 'صَـ', 'ا', 'بُـ'],
+                    hint: 'حَرْفُ النُّونِ فِي نِهَايَةِ الكَلِمَةِ (نٌ)'
+                }
+            ];
+
+            let puzzleIdx = 0;
+            let currentPlaced = [];
+
+            function loadPuzzle() {
+                const p = puzzles[puzzleIdx];
+                currentPlaced = new Array(p.slots.length).fill(null);
+
+                main.innerHTML = `
+                    <div class="flex flex-col items-center justify-between h-full space-y-3 animate-fade-in">
+                        
+                        <!-- Header Instruction -->
+                        <div class="text-center bg-indigo-950/90 border border-indigo-400/50 p-2.5 rounded-2xl w-full flex items-center justify-between gap-2">
+                            <div class="text-right">
+                                <h3 class="text-sm sm:text-base font-black text-amber-300">
+                                    🧪 المَرْحَلَة 1: مُخْتَبَرُ تَرْكِيبِ الكَلِمَاتِ (${puzzleIdx + 1} مِنْ 3)
+                                </h3>
+                                <p class="text-xs font-bold text-slate-300">
+                                    اضْغَطْ عَلَى المَغْنَاطِيسَاتِ لِتَرْكِيبِ الكَلِمَةِ الصَّحِيحَةِ!
+                                </p>
+                            </div>
+                            <button onclick="speakArabic('${p.hint}')" class="bg-indigo-600 text-white p-2 rounded-xl text-xs font-bold btn-action" aria-label="تسميع التلميح">
+                                <i class="fas fa-volume-high"></i>
+                            </button>
+                        </div>
+
+                        <!-- Picture Clue & Word Lab Container -->
+                        <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-3xl p-4 w-full max-w-lg shadow-xl flex flex-col items-center space-y-3">
+                            <div class="text-5xl sm:text-6xl">${p.img}</div>
+
+                            <!-- Target Slots Container -->
+                            <div id="slots-container" class="flex flex-wrap justify-center gap-2 my-2">
+                                ${p.slots.map((_, i) => `
+                                    <div onclick="removePlacedTile(${i})" id="slot-${i}" class="slot-target w-12 h-14 sm:w-14 sm:h-16 rounded-2xl flex items-center justify-center text-xl sm:text-2xl font-black text-amber-300 cursor-pointer">
+                                        
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Available Letter Magnetic Tiles -->
+                        <div id="tiles-container" class="flex flex-wrap justify-center gap-3 w-full max-w-lg">
+                            ${p.tiles.map((tile, i) => `
+                                <button onclick="placeTile('${tile}', ${i})" id="tile-btn-${i}" class="bg-gradient-to-b from-indigo-600 to-purple-700 border-2 border-indigo-300 text-white w-12 h-14 sm:w-14 sm:h-16 rounded-2xl text-xl sm:text-2xl font-black shadow-lg btn-action">
+                                    ${tile}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Next Level / Complete Container -->
+                        <div id="puz-next-box" class="hidden w-full flex justify-center pt-2">
+                            <button onclick="nextPuzzleOrLevel()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-base px-8 py-2.5 rounded-2xl shadow-lg border-b-4 border-teal-800 btn-action flex items-center gap-2">
+                                <span id="puz-next-btn-txt">الكَلِمَةُ التَّالِيَةُ 🚀</span>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                speakArabic(`رَكِّبْ كَلِمَةَ ${p.word}`);
+            }
+
+            loadPuzzle();
+
+            window.placeTile = function(tileChar, tileIndex) {
+                const p = puzzles[puzzleIdx];
+                const emptySlotIndex = currentPlaced.findIndex(val => val === null);
+
+                if (emptySlotIndex === -1) return;
+
+                synth.playLaser();
+                speakArabic(tileChar);
+
+                currentPlaced[emptySlotIndex] = { char: tileChar, tileIdx: tileIndex };
+
+                const slotElem = document.getElementById(`slot-${emptySlotIndex}`);
+                if (slotElem) {
+                    slotElem.innerText = tileChar;
+                    slotElem.className = 'w-12 h-14 sm:w-14 sm:h-16 rounded-2xl flex items-center justify-center text-xl sm:text-2xl font-black text-amber-300 bg-indigo-600 border-2 border-amber-300 cursor-pointer shadow-md';
+                }
+
+                const tileBtn = document.getElementById(`tile-btn-${tileIndex}`);
+                if (tileBtn) {
+                    tileBtn.classList.add('opacity-20', 'pointer-events-none');
+                }
+
+                // Check if all slots filled
+                if (!currentPlaced.includes(null)) {
+                    const constructedWord = currentPlaced.map(item => item.char).join('');
+                    const targetWord = p.slots.join('');
+
+                    if (constructedWord === targetWord) {
+                        synth.playSuccess();
+                        addScore(20);
+                        showToast(`إِجَابَةٌ مُمْتَازَةٌ! كَلِمَةُ (${p.word}) صَحِيحَةٌ!`, true, '🎉');
+
+                        speakArabic(`أَحْسَنْتَ! كَلِمَةُ ${p.word} صَحِيحَةٌ!`);
+
+                        const nextBox = document.getElementById('puz-next-box');
+                        if (nextBox) nextBox.classList.remove('hidden');
+                        if (puzzleIdx === puzzles.length - 1) {
+                            const btnTxt = document.getElementById('puz-next-btn-txt');
+                            if (btnTxt) btnTxt.innerText = "الانْتِقَالُ لِلْمَرْحَلَةِ 2 🚀";
+                        }
+                    } else {
+                        synth.playError();
+                        showToast(`تَرْتِيبٌ غَيْرُ صَحِيحٍ، حَاوِلْ مَرَّةً أُخْرَى!`, false, '❌');
+                    }
+                }
+            };
+
+            window.removePlacedTile = function(slotIndex) {
+                if (currentPlaced[slotIndex] === null) return;
+
+                const item = currentPlaced[slotIndex];
+                currentPlaced[slotIndex] = null;
+
+                const slotElem = document.getElementById(`slot-${slotIndex}`);
+                if (slotElem) {
+                    slotElem.innerText = '';
+                    slotElem.className = 'slot-target w-12 h-14 sm:w-14 sm:h-16 rounded-2xl flex items-center justify-center text-xl sm:text-2xl font-black text-amber-300 cursor-pointer';
+                }
+
+                const tileBtn = document.getElementById(`tile-btn-${item.tileIdx}`);
+                if (tileBtn) {
+                    tileBtn.classList.remove('opacity-20', 'pointer-events-none');
+                }
+
+                // Hide next box if user edits an already solved puzzle slot
+                const nextBox = document.getElementById('puz-next-box');
+                if (nextBox) nextBox.classList.add('hidden');
+            };
+
+            window.nextPuzzleOrLevel = function() {
+                puzzleIdx++;
+                if (puzzleIdx < puzzles.length) {
+                    loadPuzzle();
+                } else {
+                    levelStars[0] = 3;
+                    if (unlockedLevel < 2) unlockedLevel = 2;
+                    startLevel(2);
+                }
+            };
+        }
+
+        // ==========================================
+        // LEVEL 2: "مَسَارُ الصَّارُوخِ الفَضَائِيِّ"
+        // ==========================================
+        function renderLevel2() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            const pathNodes = [
+                { id: 0, char: 'نَ', isCorrect: true, type: 'فتحة' },
+                { id: 1, char: 'مَ', isCorrect: false, type: 'حرف آخر' },
+                { id: 2, char: 'نُ', isCorrect: true, type: 'ضمة' },
+                { id: 3, char: 'نِ', isCorrect: true, type: 'كسرة' },
+                { id: 4, char: 'لُ', isCorrect: false, type: 'حرف آخر' },
+                { id: 5, char: 'نَا', isCorrect: true, type: 'مد بالألف' },
+                { id: 6, char: 'نُو', isCorrect: true, type: 'مد بالواو' },
+                { id: 7, char: 'نِي', isCorrect: true, type: 'مد بالياء' },
+                { id: 8, char: 'نًـا', isCorrect: true, type: 'تنوين فتح' }
+            ];
+
+            let currentNodeStep = 0;
+            const totalRequiredSteps = 5;
+
+            main.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full space-y-3 animate-fade-in">
+                    
+                    <!-- Instruction Header -->
+                    <div class="text-center bg-indigo-950/90 border border-indigo-400/50 p-2.5 rounded-2xl w-full flex items-center justify-between gap-2">
+                        <div class="text-right">
+                            <h3 class="text-sm sm:text-base font-black text-amber-300">
+                                🚀 المَرْحَلَة 2: مَسَارُ الصَّارُوخِ الفَضَائِيِّ
+                            </h3>
+                            <p class="text-xs font-bold text-slate-300">
+                                اخْتَرِ الكَوَاكِبَ الَّتِي تَحْمِلُ أصْوَاتَ النُّونِ (حَرَكَاتٌ، مُدُودٌ، تَنْوِينٌ) لِيَصِلَ الصَّارُوخُ بِلَامٍ!
+                            </p>
+                        </div>
+                        <button onclick="speakArabic('اخْتَرِ الكَوَاكِبَ الَّتِي تَحْمِلُ أصْوَاتَ النُّونِ الصَّحِيحَةَ!')" class="bg-indigo-600 text-white p-2 rounded-xl text-xs font-bold btn-action" aria-label="تسميع التعليمات">
+                            <i class="fas fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <!-- Rocket Journey Visualizer -->
+                    <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-3xl p-4 w-full max-w-lg flex items-center justify-between gap-2">
+                        <div id="rocket-icon" class="text-4xl sm:text-5xl animate-float-rocket transition-all duration-500">🚀</div>
+                        
+                        <!-- Progress Fuel Meter Bar -->
+                        <div class="flex-1 space-y-1">
+                            <div class="flex justify-between text-xs font-black text-amber-300">
+                                <span>وَقُودُ المَسَارِ:</span>
+                                <span id="fuel-txt">0 / ${totalRequiredSteps}</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-3 border border-slate-600 overflow-hidden">
+                                <div id="fuel-bar" class="bg-gradient-to-r from-amber-400 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <div class="text-4xl sm:text-5xl">🪐</div>
+                    </div>
+
+                    <!-- Planetary Orbit Nodes Grid -->
+                    <div class="grid grid-cols-3 gap-3 w-full max-w-md my-auto">
+                        ${pathNodes.map((node, i) => `
+                            <button onclick="selectPlanetNode(${i}, ${node.isCorrect}, '${node.char}')" id="node-btn-${i}" class="bg-gradient-to-b from-indigo-900 to-slate-900 border-2 border-indigo-400/60 hover:border-amber-400 rounded-2xl p-3 flex flex-col items-center justify-center btn-action shadow-md">
+                                <span class="text-2xl sm:text-3xl mb-1">🪐</span>
+                                <span class="text-xl sm:text-2xl font-black text-amber-300">${node.char}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <div id="lvl2-next-box" class="hidden w-full flex justify-center pt-2">
+                        <button onclick="finishLvl2()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-base px-8 py-2.5 rounded-2xl shadow-lg border-b-4 border-teal-800 btn-action flex items-center gap-2">
+                            <span>الانْتِقَالُ لِلْمَرْحَلَةِ 3 🚀</span>
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            speakArabic("اخْتَرِ الكَوَاكِبَ الَّتِي تَحْمِلُ أصْوَاتَ النُّونِ!");
+
+            window.selectPlanetNode = function(nodeIdx, isCorrect, char) {
+                const btn = document.getElementById(`node-btn-${nodeIdx}`);
+                if (!btn || btn.disabled) return;
+
+                speakArabic(char);
+
+                if (isCorrect) {
+                    btn.disabled = true;
+                    btn.className = 'bg-emerald-950 border-2 border-emerald-400 rounded-2xl p-3 flex flex-col items-center justify-center opacity-80 cursor-default';
+
+                    synth.playSuccess();
+                    currentNodeStep++;
+                    addScore(15);
+
+                    const percent = Math.min((currentNodeStep / totalRequiredSteps) * 100, 100);
+                    const fuelBar = document.getElementById('fuel-bar');
+                    const fuelTxt = document.getElementById('fuel-txt');
+                    
+                    if (fuelBar) fuelBar.style.width = `${percent}%`;
+                    if (fuelTxt) fuelTxt.innerText = `${currentNodeStep} / ${totalRequiredSteps}`;
+
+                    showToast(`رَائِع! صَوْتُ (${char}) مِنْ أَصْوَاتِ النُّونِ!`, true, '🚀');
+
+                    if (currentNodeStep >= totalRequiredSteps) {
+                        const nextBox = document.getElementById('lvl2-next-box');
+                        if (nextBox) nextBox.classList.remove('hidden');
+                        speakArabic("مَبْرُوك! وَصَلَ الصَّارُوخُ إِلَى الكَوْكَبِ بِنَجَاح! اضْغَطْ للانْتِقَالِ لِلْمَرْحَلَةِ التَّالِيَةِ.");
+                    }
+                } else {
+                    synth.playError();
+                    showToast(`هَذَا لَيْسَ مِنْ أَصْوَاتِ حَرْفِ النُّونِ!`, false, '❌');
+                }
+            };
+
+            window.finishLvl2 = function() {
+                levelStars[1] = 3;
+                if (unlockedLevel < 3) unlockedLevel = 3;
+                startLevel(3);
+            };
+        }
+
+        // ==========================================
+        // LEVEL 3: "مُحَقِّقُ النُّونِ السِّرِّيُّ"
+        // ==========================================
+        function renderLevel3() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            const detectiveQuizzes = [
+                {
+                    sentence: 'يَسْبَحُ كَائِنُ الـ ___ فِي البَحْرِ.',
+                    options: ['دُلْفِينِ', 'سَمَكِ', 'قَرْشِ'],
+                    correct: 'دُلْفِينِ',
+                    question: 'أَكْمِلِ الجُمْلَةَ بِكَلِمَةٍ بَيْنَهَا حَرْفُ النُّونِ!'
+                },
+                {
+                    sentence: 'الصَّدِيقُ المَاهِرُ هُوَ ___ حَقِيقِيٌّ.',
+                    options: ['كَنْزٌ', 'قَلَمٌ', 'بَابٌ'],
+                    correct: 'كَنْزٌ',
+                    question: 'اخْتَرِ الكَلِمَةَ الَّتِي تَنْتَهِي بِتَنْوِينِ الضَّمِّ مَعَ النُّونِ!'
+                },
+                {
+                    sentence: 'تَطِيرُ الـ ___ بَيْنَ الأَزْهَارِ.',
+                    options: ['نَحْلَةُ', 'فَرَاشَةُ', 'طَائِرُ'],
+                    correct: 'نَحْلَةُ',
+                    question: 'اخْتَرِ الكَلِمَةَ الَّتِي تَبْدَأُ بِحَرْفِ النُّونِ!'
+                }
+            ];
+
+            let detIdx = 0;
+
+            function loadDetectiveQuest() {
+                const q = detectiveQuizzes[detIdx];
+
+                main.innerHTML = `
+                    <div class="flex flex-col items-center justify-between h-full space-y-3 animate-fade-in">
+                        
+                        <!-- Detective Header -->
+                        <div class="text-center bg-indigo-950/90 border border-indigo-400/50 p-2.5 rounded-2xl w-full flex items-center justify-between gap-2">
+                            <div class="text-right">
+                                <h3 class="text-sm sm:text-base font-black text-amber-300">
+                                    🔍 المَرْحَلَة 3: مُحَقِّقُ النُّونِ السِّرِّيُّ (${detIdx + 1} مِنْ 3)
+                                </h3>
+                                <p class="text-xs font-bold text-slate-300">
+                                    ${q.question}
+                                </p>
+                            </div>
+                            <button onclick="speakArabic('${q.question}')" class="bg-indigo-600 text-white p-2 rounded-xl text-xs font-bold btn-action" aria-label="تسميع السؤال">
+                                <i class="fas fa-volume-high"></i>
+                            </button>
+                        </div>
+
+                        <!-- Detective Magnifying Glass Container -->
+                        <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-3xl p-5 w-full max-w-lg text-center shadow-xl space-y-3">
+                            <div class="text-5xl sm:text-6xl my-1">🕵️‍♂️🔍</div>
+                            
+                            <div id="sentence-display" class="bg-slate-800/90 border border-amber-400/60 rounded-2xl p-4 text-xl sm:text-2xl font-black text-slate-100 leading-relaxed shadow-inner">
+                                "${q.sentence.replace('___', '<span class="text-amber-400 border-b-2 border-amber-400 px-2">...</span>')}"
+                            </div>
+                        </div>
+
+                        <!-- Detective Option Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg">
+                            ${q.options.map((opt) => `
+                                <button onclick="checkDetectiveAnswer('${opt}', '${q.correct}')" class="bg-gradient-to-b from-indigo-900 to-purple-950 border-2 border-indigo-300 hover:border-amber-400 text-white p-3.5 rounded-2xl text-xl font-black shadow-md btn-action">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div id="det-next-box" class="hidden w-full flex justify-center pt-2">
+                            <button onclick="nextDetectiveOrLevel()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-base px-8 py-2.5 rounded-2xl shadow-lg border-b-4 border-teal-800 btn-action flex items-center gap-2">
+                                <span id="det-next-btn-txt">اللُّغْزُ التَّالِي 🔍</span>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                speakArabic(q.question);
+            }
+
+            loadDetectiveQuest();
+
+            window.checkDetectiveAnswer = function(selected, correct) {
+                speakArabic(selected);
+
+                if (selected === correct) {
+                    synth.playSuccess();
+                    addScore(20);
+                    showToast(`إِجَابَةٌ ذَكِيَّةٌ يَا مُحَقِّقَ النُّونِ!`, true, '🔍');
+
+                    const display = document.getElementById('sentence-display');
+                    if (display) {
+                        const q = detectiveQuizzes[detIdx];
+                        display.innerHTML = `"${q.sentence.replace('___', `<span class="text-amber-300 font-bold underline">${selected}</span>`)}"`;
+                    }
+
+                    const nextBox = document.getElementById('det-next-box');
+                    if (nextBox) nextBox.classList.remove('hidden');
+
+                    if (detIdx === detectiveQuizzes.length - 1) {
+                        const btnTxt = document.getElementById('det-next-btn-txt');
+                        if (btnTxt) btnTxt.innerText = "الانْتِقَالُ لِلْمَرْحَلَةِ 4 🚀";
+                    }
+                } else {
+                    synth.playError();
+                    showToast(`إِجَابَةٌ خَاطِئَةٌ، حَاوِلْ مَرَّةً أُخْرَى!`, false, '❌');
+                }
+            };
+
+            window.nextDetectiveOrLevel = function() {
+                detIdx++;
+                if (detIdx < detectiveQuizzes.length) {
+                    loadDetectiveQuest();
+                } else {
+                    levelStars[2] = 3;
+                    if (unlockedLevel < 4) unlockedLevel = 4;
+                    startLevel(4);
+                }
+            };
+        }
+
+        // ==========================================
+        // LEVEL 4: "تَحَدِّي السُّرْعَةِ وَالتَّصْنِيفِ"
+        // ==========================================
+        function renderLevel4() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            const wordsToClassify = [
+                { word: 'نَـخْلَة', category: 'start' },
+                { word: 'عِـنَـب', category: 'middle' },
+                { word: 'صَابُـون', category: 'end' },
+                { word: 'نُـور', category: 'start' },
+                { word: 'مَـنْـزِل', category: 'middle' },
+                { word: 'مِيزَان', category: 'end' }
+            ];
+
+            let wordIndex = 0;
+
+            function renderCurrentConveyorWord() {
+                if (wordIndex >= wordsToClassify.length) {
+                    main.innerHTML = `
+                        <div class="flex flex-col items-center justify-center text-center py-8 space-y-4 animate-fade-in">
+                            <div class="text-5xl">⚡🎉</div>
+                            <h3 class="text-2xl font-black text-amber-300">أَبْدَعْتَ فِي التَّصْنِيفِ السَّرِيعِ!</h3>
+                            <p class="text-slate-300 font-bold">لَقَدْ صَنَّفْتَ جَمِيعَ الكَلِمَاتِ بِنَجَاحٍ!</p>
+                            <button onclick="finishLvl4()" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-base px-8 py-3 rounded-2xl shadow-lg btn-action flex items-center gap-2">
+                                <span>الانْتِقَالُ لِلْمَرْحَلَةِ 5 🚀</span>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    `;
+                    speakArabic("مَبْرُوك! أَنْتَ بَطَلُ التَّصْنِيفِ السَّرِيعِ!");
+                    return;
+                }
+
+                const item = wordsToClassify[wordIndex];
+
+                main.innerHTML = `
+                    <div class="flex flex-col items-center justify-between h-full space-y-3 animate-fade-in">
+                        
+                        <!-- Header -->
+                        <div class="text-center bg-indigo-950/90 border border-indigo-400/50 p-2.5 rounded-2xl w-full flex items-center justify-between gap-2">
+                            <div class="text-right">
+                                <h3 class="text-sm sm:text-base font-black text-amber-300">
+                                    ⚡ المَرْحَلَة 4: تَحَدِّي السُّرْعَةِ وَالتَّصْنِيفِ (${wordIndex + 1} مِنْ ${wordsToClassify.length})
+                                </h3>
+                                <p class="text-xs font-bold text-slate-300">
+                                    صَنِّفِ الكَلِمَةَ حَسَبَ مَوْقِعِ حَرْفِ النُّونِ فِي السَّلَّةِ المُنَاسِبَةِ!
+                                </p>
+                            </div>
+                            <button onclick="speakArabic('${item.word}')" class="bg-indigo-600 text-white p-2 rounded-xl text-xs font-bold btn-action" aria-label="تسميع الكلمة">
+                                <i class="fas fa-volume-high"></i>
+                            </button>
+                        </div>
+
+                        <!-- Conveyor Belt Word Display -->
+                        <div id="conveyor-card" class="bg-slate-900 border-4 border-amber-400/80 rounded-3xl p-6 w-full max-w-md text-center shadow-2xl animate-pulse-glow">
+                            <span class="text-xs font-bold text-slate-400 block mb-1">الكَلِمَةُ الحَالِيَّةُ:</span>
+                            <span class="text-3xl sm:text-5xl font-black text-amber-300 tracking-wider">${item.word}</span>
+                        </div>
+
+                        <!-- 3 Classification Bins -->
+                        <div class="grid grid-cols-3 gap-2 sm:gap-3 w-full max-w-lg my-auto">
+                            
+                            <button onclick="classifyWord('start')" class="bg-gradient-to-b from-indigo-800 to-slate-900 border-2 border-indigo-400 hover:border-amber-400 p-3 rounded-2xl flex flex-col items-center justify-center btn-action shadow-md">
+                                <span class="text-2xl sm:text-3xl">📥</span>
+                                <span class="text-xs sm:text-sm font-black text-amber-300 mt-1">بِدَايَة الكَلِمَة</span>
+                                <span class="text-xs text-slate-300">(نَـ / نُـ / نِـ)</span>
+                            </button>
+
+                            <button onclick="classifyWord('middle')" class="bg-gradient-to-b from-purple-800 to-slate-900 border-2 border-purple-400 hover:border-amber-400 p-3 rounded-2xl flex flex-col items-center justify-center btn-action shadow-md">
+                                <span class="text-2xl sm:text-3xl">📥</span>
+                                <span class="text-xs sm:text-sm font-black text-amber-300 mt-1">وَسَط الكَلِمَة</span>
+                                <span class="text-xs text-slate-300">(ـنْـ / ـنَـ)</span>
+                            </button>
+
+                            <button onclick="classifyWord('end')" class="bg-gradient-to-b from-teal-800 to-slate-900 border-2 border-teal-400 hover:border-amber-400 p-3 rounded-2xl flex flex-col items-center justify-center btn-action shadow-md">
+                                <span class="text-2xl sm:text-3xl">📥</span>
+                                <span class="text-xs sm:text-sm font-black text-amber-300 mt-1">نِهَايَة الكَلِمَة</span>
+                                <span class="text-xs text-slate-300">(ـن / ن)</span>
+                            </button>
+
+                        </div>
+                    </div>
+                `;
+
+                speakArabic(item.word);
+            }
+
+            renderCurrentConveyorWord();
+
+            window.classifyWord = function(chosenCategory) {
+                const current = wordsToClassify[wordIndex];
+                if (!current) return;
+
+                if (chosenCategory === current.category) {
+                    synth.playSuccess();
+                    addScore(15);
+                    showToast(`تصْنِيفٌ صَحِيحٌ لِكَلِمَةِ (${current.word})!`, true, '⚡');
+
+                    wordIndex++;
+                    renderCurrentConveyorWord();
+                } else {
+                    synth.playError();
+                    showToast(`حَاوِلْ مَرَّةً أُخْرَى فِي تَصْنِيفِ المَوْقِعِ!`, false, '❌');
+                }
+            };
+
+            window.finishLvl4 = function() {
+                levelStars[3] = 3;
+                if (unlockedLevel < 5) unlockedLevel = 5;
+                startLevel(5);
+            };
+        }
+
+        // ==========================================
+        // LEVEL 5: "مَعْرَكَةُ الكَنْزِ المَجَرِّيِّ"
+        // ==========================================
+        function renderLevel5() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            const bossPhases = [
+                {
+                    phase: 1,
+                    bossTitle: 'وحْشُ الحَرَكَاتِ القَصِيرَةِ 👾',
+                    question: 'اخْتَرِ الكَلِمَةَ الَّتِي بَهَا مَدٌّ بِالوَاوِ (نُو) لِهَزِيمَةِ دِرْعِ الوَحْشِ!',
+                    options: ['نُورٌ', 'نَمِرٌ', 'نِحْلَةٌ'],
+                    correct: 'نُورٌ'
+                },
+                {
+                    phase: 2,
+                    bossTitle: 'وحْشُ التَّنْوِينِ المَجَرِّيِّ 👾',
+                    question: 'اخْتَرِ الكَلِمَةَ الَّتِي تَنْتَهِي بِتَنْوِينِ الفَتْحِ (نًـا)!',
+                    options: ['وَطَنًا', 'وَطَنٌ', 'وَطَنٍ'],
+                    correct: 'وَطَنًا'
+                },
+                {
+                    phase: 3,
+                    bossTitle: 'حَارِسُ الكَنْزِ الأَخِيرِ 👑',
+                    question: 'اخْتَرِ الكَلِمَةَ الصَّحِيحَةَ كَامِلَةً لِفَتْحِ الكَنْزِ المَجَرِّيِّ!',
+                    options: ['إِنْسَانٌ', 'إِسَانٌ', 'إِنْسَامٌ'],
+                    correct: 'إِنْسَانٌ'
+                }
+            ];
+
+            let phaseIdx = 0;
+            let bossHealth = 100;
+
+            function loadBossPhase() {
+                const b = bossPhases[phaseIdx];
+
+                main.innerHTML = `
+                    <div class="flex flex-col items-center justify-between h-full space-y-3 animate-fade-in">
+                        
+                        <!-- Boss Header -->
+                        <div class="text-center bg-rose-950/90 border border-rose-400/50 p-2.5 rounded-2xl w-full flex items-center justify-between gap-2">
+                            <div class="text-right">
+                                <h3 class="text-sm sm:text-base font-black text-amber-300">
+                                    👑 المَرْحَلَة 5: مَعْرَكَةُ الكَنْزِ المَجَرِّيِّ (المَرْحَلَةُ ${phaseIdx + 1})
+                                </h3>
+                                <p class="text-xs font-bold text-slate-300">
+                                    ${b.question}
+                                </p>
+                            </div>
+                            <button onclick="speakArabic('${b.question}')" class="bg-rose-600 text-white p-2 rounded-xl text-xs font-bold btn-action" aria-label="تسميع السؤال">
+                                <i class="fas fa-volume-high"></i>
+                            </button>
+                        </div>
+
+                        <!-- Boss Visual & Health Bar -->
+                        <div class="bg-slate-900/90 border-2 border-rose-500/50 rounded-3xl p-4 w-full max-w-lg text-center space-y-2 shadow-2xl">
+                            <div class="text-5xl sm:text-6xl animate-bounce my-1">${b.bossTitle.split(' ').pop()}</div>
+                            <h4 class="text-base font-black text-rose-300">${b.bossTitle}</h4>
+
+                            <!-- Boss HP Bar -->
+                            <div class="w-full bg-slate-800 rounded-full h-4 border border-rose-500 overflow-hidden">
+                                <div id="boss-hp-bar" class="bg-gradient-to-r from-rose-500 to-amber-400 h-full transition-all duration-300" style="width: ${bossHealth}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Boss Challenge Options -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg">
+                            ${b.options.map((opt) => `
+                                <button onclick="attackBoss('${opt}', '${b.correct}')" class="bg-gradient-to-b from-rose-900 to-purple-950 border-2 border-rose-300 hover:border-amber-400 text-white p-3.5 rounded-2xl text-xl font-black shadow-lg btn-action">
+                                    ⚡ ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div id="lvl5-next-box" class="hidden w-full flex justify-center pt-2">
+                            <button onclick="nextBossPhaseOrCertificate()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-base px-8 py-2.5 rounded-2xl shadow-lg border-b-4 border-amber-700 btn-action flex items-center gap-2">
+                                <span id="boss-btn-txt">التَّحَدِّي التَّالِي 👑</span>
+                                <i class="fas fa-award"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                speakArabic(b.question);
+            }
+
+            loadBossPhase();
+
+            window.attackBoss = function(selected, correct) {
+                speakArabic(selected);
+
+                if (selected === correct) {
+                    synth.playExplosion();
+                    addScore(30);
+                    showToast(`ضَرْبَةٌ قَوِيَّةٌ! إِجَابَةٌ صَحِيحَةٌ!`, true, '⚡');
+
+                    bossHealth -= 33;
+                    if (bossHealth < 0) bossHealth = 0;
+
+                    const hpBar = document.getElementById('boss-hp-bar');
+                    if (hpBar) hpBar.style.width = `${bossHealth}%`;
+
+                    const nextBox = document.getElementById('lvl5-next-box');
+                    if (nextBox) nextBox.classList.remove('hidden');
+
+                    if (phaseIdx === bossPhases.length - 1) {
+                        const bossBtnTxt = document.getElementById('boss-btn-txt');
+                        if (bossBtnTxt) bossBtnTxt.innerText = "اسْتِلاَمُ شَهَادَةِ التَّفَوُّقِ 🎉";
+                    }
+                } else {
+                    synth.playError();
+                    showToast(`حَاوِلْ مَرَّةً أُخْرَى لِهَزِيمَةِ الوَحْشِ!`, false, '❌');
+                }
+            };
+
+            window.nextBossPhaseOrCertificate = function() {
+                phaseIdx++;
+                if (phaseIdx < bossPhases.length) {
+                    loadBossPhase();
+                } else {
+                    levelStars[4] = 3;
+                    renderCertificateScreen();
+                }
+            };
+        }
+
+        // ==========================================
+        // CERTIFICATE OF EXCELLENCE SCREEN
+        // ==========================================
+        function renderCertificateScreen() {
+            clearTimers();
+            const main = document.getElementById('main-content');
+
+            main.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center py-2 my-auto space-y-3 animate-fade-in">
+                    
+                    <!-- Certificate Printable Box -->
+                    <div class="certificate-box bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border-8 border-amber-400 p-6 rounded-3xl w-full max-w-xl shadow-2xl space-y-3 relative overflow-hidden">
+                        
+                        <div class="flex justify-between items-center border-b-2 border-amber-400/50 pb-2">
+                            <span class="text-3xl">🏆</span>
+                            <span class="text-xs sm:text-sm font-black text-amber-300">شَهَادَةُ تَفَوُّقٍ وَتَقْدِيرٍ مَجَرِّيَّةٍ</span>
+                            <span class="text-3xl">👑</span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <h2 class="text-2xl sm:text-3xl font-black text-amber-300">
+                                🏅 البَطَلُ المَاهِرُ فِي حَرْفِ النُّونِ 🏅
+                            </h2>
+                            <p class="text-xs sm:text-sm font-bold text-slate-200 leading-relaxed">
+                                نَشْهَدُ أَنَّ الطَّالِبَ المَبْدِعَ قَدْ اجْتَازَ جَمِيعَ المَرَاحِلِ الـ 5 بِنَجَاحٍ بَاهِرٍ فِي لُعْبَةِ:
+                                <br>
+                                <span class="text-amber-300 font-black">"أَكْتَشِفُ وَأَبْتَكِرُ مَعَ حَرْفِ النُّونِ"</span>
+                            </p>
+                        </div>
+
+                        <!-- 5 Stars Container -->
+                        <div class="flex justify-center gap-1.5 text-2xl sm:text-3xl text-amber-400 my-1 animate-bounce">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+
+                        <div class="bg-slate-800/90 border border-amber-400/60 rounded-2xl p-3 flex justify-between items-center px-6">
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block">إِعْدَادُ وَإِشْرَافُ:</span>
+                                <span class="text-sm font-black text-amber-300">الأُسْتَاذَةُ: مَرْيَم البَلُوشِيّ</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-xs text-slate-400 block">النِّقَاطُ الكُلِّيَّةُ:</span>
+                                <span class="text-lg font-black text-emerald-400">${totalScore} نُقْطَةً</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex flex-wrap justify-center gap-3 pt-2 no-print">
+                        <button onclick="renderWelcomeScreen()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-base px-6 py-2.5 rounded-2xl shadow-lg border-b-4 border-purple-900 btn-action flex items-center gap-2">
+                            <i class="fas fa-rotate-right"></i>
+                            <span>اللَّعِبُ مِنْ جَدِيدٍ</span>
+                        </button>
+                        <button onclick="window.print()" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-base px-6 py-2.5 rounded-2xl shadow-lg border-b-4 border-amber-600 btn-action flex items-center gap-2">
+                            <i class="fas fa-print"></i>
+                            <span>طِبَاعَةُ الشَّهَادَةِ</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            synth.playSuccess();
+            speakArabic("مَبْرُوكٌ يَا بَطَل! أَنْتَ البَطَلُ المَاهِرُ فِي حَرْفِ النُّونِ. إِعْدَادُ الأُسْتَاذَةِ مَرْيَم البَلُوشِيّ.");
+
+            // Confetti Celebration
+            if (typeof confetti === 'function') {
+                try {
+                    confetti({
+                        particleCount: 100,
+                        spread: 80,
+                        origin: { y: 0.6 }
+                    });
+                } catch (e) { console.warn('Confetti launch error:', e); }
+            }
+        }
+    </script>
+</body>
+</html>
